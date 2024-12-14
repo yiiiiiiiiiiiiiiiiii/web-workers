@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>web worker测试</h1>
+    <p>执行 fibonacci(40) 10 次，并测量时间</p>
+    <div>
+      <button id="use-worker">使用 web worker并发计算</button>
+      计算用时: <span id="result"></span>
+    </div>
+    <div>
+      <button id="js">使用 js 计算</button>
+      计算用时: <span id="js-result"></span>
+    </div>
+    <script src="fibonacci.js"></script>
+    <script>
+      document.getElementById("use-worker").addEventListener("click", () => {
+        let finished = 0;
+        const start = performance.now();
+        for (let index = 0; index < 10; index++) {
+          const worker = new Worker("web_worker.js");
+
+          worker.addEventListener("message", (event) => {
+            console.log(event.data);
+            finished++;
+            worker.terminate();
+            if (finished === 10) {
+              const end = performance.now();
+              const time = end - start;
+              document.getElementById("result").textContent =
+                time.toFixed(0) + "ms";
+            }
+          });
+
+          worker.postMessage(40);
+        }
+      });
+
+      document.getElementById("js").addEventListener("click", () => {
+        const start = performance.now();
+        for (let index = 0; index < 10; index++) {
+          const result = fibonacci(40);
+          console.log(result);
+        }
+        const end = performance.now();
+        const time = end - start;
+        document.getElementById("js-result").textContent =
+          time.toFixed(0) + "ms";
+      });
+    </script>
+  </body>
+</html>

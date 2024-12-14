@@ -1,0 +1,19 @@
+{
+  "name": "web-workers",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:web": "node index.js --path fe/web_worker",
+    "start:shared": "node index.js --path fe/shared_worker",
+    "start:service": "node index.js --path fe/service_worker",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "minimist": "^1.2.8"
+  }
+}

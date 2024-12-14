@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="send-fetch">使用 Service Worker 发起fetch请求</button>
+    <button id="send-message">向 Service Worker 发送消息</button>
+    <button id="destroy-sw">销毁 Service Worker</button>
+  </body>
+  <script>
+    (async () => {
+      const d = { id: 99 };
+
+      async function createSW() {
+        if (!("serviceWorker" in navigator)) {
+          console.log("当前浏览器不支持 Service Worker");
+          return;
+        }
+
+        console.log("可以使用 Service Worker");
+
+        try {
+          const registration = await navigator.serviceWorker.register(
+            "./service_worker.js"
+          );
+
+          console.log(
+            "Service Worker 注册成功:",
+            registration,
+            registration.scope
+          );
+
+          navigator.serviceWorker.addEventListener("message", (event) => {
+            console.log("js线程收到Service Worker消息:", event.data);
+          });
+        } catch (error) {
+          console.log("Service Worker 注册失败:", error);
+        }
+      }
+
+      function registerButton() {
+        const fetchButton = document.getElementById("send-fetch");
+        fetchButton.addEventListener("click", async () => {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            const response = await fetch("/cache_data.json");
+            const data = await response.json();
+            console.log("从 Service Worker 缓存中获取数据:", data);
+          }
+        });
+
+        const sendButton = document.getElementById("send-message");
+        sendButton.addEventListener("click", async () => {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            registration.active.postMessage(d);
+            console.log("js线程向 Service Worker发送消息：", d);
+          }
+        });
+
+        const button = document.getElementById("destroy-sw");
+        button.addEventListener("click", async () => {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            await registration.unregister();
+            console.log("Service Worker 已销毁");
+          }
+        });
+      }
+
+      await createSW();
+      registerButton();
+    })();
+  </script>
+</html>

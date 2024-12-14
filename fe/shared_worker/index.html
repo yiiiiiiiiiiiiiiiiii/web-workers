@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>index page:</p>
+    count: <span id="container">0</span>
+    <button id="add">add</button>
+    <br />
+    <iframe src="iframe.html"></iframe>
+    <script type="text/javascript">
+      if (!!window.SharedWorker) {
+        const container = document.getElementById("container");
+        const add = document.getElementById("add");
+
+        const myWorker = new SharedWorker("shared_worker.js");
+
+        myWorker.port.start();
+
+        myWorker.port.addEventListener("message", (msg) => {
+          container.innerText = msg.data;
+        });
+
+        add.addEventListener("click", () => {
+          myWorker.port.postMessage("add");
+        });
+      }
+    </script>
+  </body>
+</html>
